@@ -1,6 +1,0 @@
-[submodule "grub"]
-	path = grub
-	url = git://github.com/M1cha/grub.git
-[submodule "lk"]
-	path = lk
-	url = git://github.com/M1cha/lk.git
