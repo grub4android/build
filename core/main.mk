@@ -31,20 +31,37 @@ $(DEFAULT_GOAL):
 
 # paths
 GRUB_DIR = $(TOPDIR)grub
+LK_DIR = $(TOPDIR)lk
 OUT_DIR = $(TOPDIR)out
 CONFIG_DIR = $(TOPDIR)build/config
+PREBUILTS_DIR = $(TOPDIR)prebuilts
+TARGET_OUT = $(OUT_DIR)/$(firstword $(MAKECMDGOALS))
 
 # files
 FILE_GRUB_KERNEL = $(OUT_DIR)/grub_kernel.raw
 FILE_GRUB_CONFIG = $(CONFIG_DIR)/load.cfg
 FILE_UBOOT_IMAGE = $(OUT_DIR)/uboot.img
 
-# config
-TOOLCHAIN_PREFIX = arm-linux-gnueabihf
-GRUB_LOADING_ADDRESS = 0x08000000
+# toolchain
+TOOLCHAIN_LINUX_GNUEABIHF = $(PREBUILTS_DIR)/gcc/linux-x86/arm/arm-linux-gnueabihf-4.9
+TOOLCHAIN_LINUX_GNUEABIHF_HOST = arm-linux-gnueabihf
+TOOLCHAIN_LINUX_GNUEABIHF_LIBC = $(TOOLCHAIN_LINUX_GNUEABIHF)/$(TOOLCHAIN_LINUX_GNUEABIHF_HOST)/libc
+
+TOOLCHAIN_NONE_EABI = $(PREBUILTS_DIR)/gcc/linux-x86/arm/arm-none-eabi-4.9
+TOOLCHAIN_NONE_EABI_PREFIX = arm-none-eabi-
+ARM_CROSS_COMPILE = ARCH=arm SUBARCH=arm CROSS_COMPILE=$(TOOLCHAIN_NONE_EABI_PREFIX) TOOLCHAIN_PREFIX=$$CROSS_COMPILE
 
 # create OUT_DIR
 $(shell mkdir -p $(OUT_DIR))
+$(shell mkdir -p $(TARGET_OUT))
+
+# default variables
+GRUB_LOADING_ADDRESS = 0x08000000
+
+# shell
+SHELL := /bin/bash
+PATH := $(PWD)/$(TOOLCHAIN_LINUX_GNUEABIHF)/bin:$(PATH)
+PATH := $(PWD)/$(TOOLCHAIN_NONE_EABI)/bin:$(PATH)
 
 
 #=============================================================================
@@ -62,7 +79,7 @@ grub_configure: $(GRUB_DIR)/Makefile
 $(GRUB_DIR)/Makefile:
 	@ cd $(GRUB_DIR) && \
 	./autogen.sh && \
-	./configure --host $(TOOLCHAIN_PREFIX)
+	./configure --host $(TOOLCHAIN_LINUX_GNUEABIHF_HOST)
 
 # main kernel
 grub_core: grub_configure
@@ -71,7 +88,7 @@ grub_core: grub_configure
 
 # u-boot image
 grub_uboot: grub_core
-	qemu-arm -r 3.11 -L $(CROSSROOT)/$(TOOLCHAIN_PREFIX)/libc \
+	qemu-arm -r 3.11 -L $(TOOLCHAIN_LINUX_GNUEABIHF_LIBC) \
 		$(GRUB_DIR)/grub-mkimage -c $(FILE_GRUB_CONFIG) -O arm-uboot -o $(FILE_UBOOT_IMAGE) \
 			-d $(GRUB_DIR)/grub-core -p /boot/grub -T $(GRUB_LOADING_ADDRESS)
 .PHONY : grub_uboot
@@ -87,9 +104,10 @@ grub_kernel: grub_uboot
 
 clean:
 	rm -Rf $(OUT_DIR)/*
+	rm -Rf $(LK_DIR)/build-*
 	$(MAKE) -C $(GRUB_DIR) clean
 .PHONY : clean
 
-distclean:
+distclean: clean
 	$(MAKE) -C $(GRUB_DIR) distclean
 .PHONY : distclean
