@@ -35,7 +35,7 @@ LK_DIR = $(TOPDIR)lk
 OUT_DIR = $(TOPDIR)out
 CONFIG_DIR = $(TOPDIR)build/config
 PREBUILTS_DIR = $(TOPDIR)prebuilts
-TARGET_OUT = $(OUT_DIR)/$(firstword $(MAKECMDGOALS))
+TARGET_OUT = $(OUT_DIR)/$(shell echo $(firstword $(MAKECMDGOALS)) | cut -d'_' -f1)
 
 # files
 FILE_GRUB_KERNEL = $(OUT_DIR)/grub_kernel.raw
