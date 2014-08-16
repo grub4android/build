@@ -1,34 +1,56 @@
-# Default target executed when no arguments are given to make.
-default_target: all
-.PHONY : default_target
+#=============================================================================
+# BASIC ENVIRONMENT SETUP
+
+# this turns off the suffix rules built into make
+.SUFFIXES:
+
+# this turns off the RCS / SCCS implicit rules of GNU Make
+% : RCS/%,v
+% : RCS/%
+% : %,v
+% : s.%
+% : SCCS/s.%
+
+# If a rule fails, delete $@.
+.DELETE_ON_ERROR:
+
+# Absolute path of the present working direcotry.
+# This overrides the shell variable $PWD, which does not necessarily points to
+# the top of the source tree, for example when "make -C" is used in m/mm/mmm.
+PWD := $(shell pwd)
+
+TOP := .
+TOPDIR :=
+
+BUILD_SYSTEM := $(TOPDIR)build/core
+
+# This is the default target.  It must be the first declared target.
+.PHONY: all
+DEFAULT_GOAL := all
+$(DEFAULT_GOAL):
 
 # paths
-GRUB_DIR = ./grub
-BUILD_DIR = ./build
-CONFIG_DIR = ./config
+GRUB_DIR = $(TOPDIR)grub
+OUT_DIR = $(TOPDIR)out
+CONFIG_DIR = $(TOPDIR)build/config
 
 # files
-FILE_GRUB_KERNEL = $(BUILD_DIR)/grub_kernel.raw
+FILE_GRUB_KERNEL = $(OUT_DIR)/grub_kernel.raw
 FILE_GRUB_CONFIG = $(CONFIG_DIR)/load.cfg
-FILE_UBOOT_IMAGE = $(BUILD_DIR)/uboot.img
+FILE_UBOOT_IMAGE = $(OUT_DIR)/uboot.img
 
 # config
 TOOLCHAIN_PREFIX = arm-linux-gnueabihf
 GRUB_LOADING_ADDRESS = 0x08000000
 
+# create OUT_DIR
+$(shell mkdir -p $(OUT_DIR))
+
+
 #=============================================================================
 # DEVICES
 
-include devices/*.mk
-
-#=============================================================================
-# MAIN
-
-all: $(BUILD_DIR) grub_kernel
-.PHONY : all
-
-$(BUILD_DIR):
-	mkdir -p $(BUILD_DIR)
+include $(TOPDIR)build/devices/*.mk
 
 
 #=============================================================================
@@ -64,8 +86,8 @@ grub_kernel: grub_uboot
 # CLEANUP
 
 clean:
+	rm -Rf $(OUT_DIR)/*
 	$(MAKE) -C $(GRUB_DIR) clean
-	rm -Rf $(BUILD_DIR)
 .PHONY : clean
 
 distclean:
