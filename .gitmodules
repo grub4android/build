@@ -1,0 +1,3 @@
+[submodule "grub"]
+	path = grub
+	url = git://github.com/M1cha/grub.git
