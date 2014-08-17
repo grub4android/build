@@ -29,18 +29,27 @@ BUILD_SYSTEM := $(TOPDIR)build/core
 DEFAULT_GOAL := all
 $(DEFAULT_GOAL):
 
+# verfiy device name
+DEVICE_NAME = $(firstword $(MAKECMDGOALS))
+ifeq ($(DEVICE_NAME),)
+$(error No device specified.  Use "make devicename")
+endif
+ifeq ($(wildcard build/devices/$(DEVICE_NAME).mk),)
+$(error $(DEVICE_NAME) is not a valid device.)
+endif
+
 # paths
 GRUB_DIR = $(TOPDIR)grub
 LK_DIR = $(TOPDIR)lk
 OUT_DIR = $(TOPDIR)out
 CONFIG_DIR = $(TOPDIR)build/config
 PREBUILTS_DIR = $(TOPDIR)prebuilts
-TARGET_OUT = $(OUT_DIR)/$(shell echo $(firstword $(MAKECMDGOALS)) | cut -d'_' -f1)
+TARGET_OUT = $(OUT_DIR)/$(DEVICE_NAME)
 
 # files
-FILE_GRUB_KERNEL = $(OUT_DIR)/grub_kernel.raw
+FILE_GRUB_KERNEL = $(TARGET_OUT)/grub_kernel.raw
 FILE_GRUB_CONFIG = $(CONFIG_DIR)/load.cfg
-FILE_UBOOT_IMAGE = $(OUT_DIR)/uboot.img
+FILE_UBOOT_IMAGE = $(TARGET_OUT)/uboot.img
 
 # toolchain
 TOOLCHAIN_LINUX_GNUEABIHF = $(PREBUILTS_DIR)/gcc/linux-x86/arm/arm-linux-gnueabihf-4.9
@@ -67,7 +76,15 @@ PATH := $(PWD)/$(TOOLCHAIN_NONE_EABI)/bin:$(PATH)
 #=============================================================================
 # DEVICES
 
-include $(TOPDIR)build/devices/*.mk
+include $(TOPDIR)build/devices/$(DEVICE_NAME).mk
+
+ifeq ($(DEVICE_NAME),$(MAKECMDGOALS))
+$(DEVICE_NAME): build
+.PHONY: $(DEVICE_NAME)
+else
+$(DEVICE_NAME):
+.PHONY: $(DEVICE_NAME)
+endif
 
 
 #=============================================================================
