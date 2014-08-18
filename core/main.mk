@@ -130,7 +130,7 @@ grub_kernel: grub_uboot
 grub_boot_fs: grub_kernel
 	# cleanup
 	rm -Rf $(GRUB_BOOT_FS_DIR)/boot/grub
-	rm /tmp/grub_font.pf2
+	rm -f /tmp/grub_font.pf2
 	
 	# directories
 	mkdir -p $(GRUB_BOOT_FS_DIR)/boot/grub
