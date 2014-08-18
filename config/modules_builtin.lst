@@ -11,3 +11,8 @@ part_gpt
 part_msdos
 fat
 ext2
+uboot_fb
+gfxmenu
+videoinfo
+videotest
+uboot_keyboard
