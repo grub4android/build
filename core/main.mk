@@ -128,6 +128,10 @@ grub_kernel: grub_uboot
 
 # boot image
 grub_boot_fs: grub_kernel
+	# cleanup
+	rm -Rf $(GRUB_BOOT_FS_DIR)/boot/grub
+	rm /tmp/grub_font.pf2
+	
 	# directories
 	mkdir -p $(GRUB_BOOT_FS_DIR)/boot/grub
 	mkdir -p $(GRUB_BOOT_FS_DIR)/boot/grub/fonts
