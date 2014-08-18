@@ -34,7 +34,7 @@ DEVICE_NAME = $(firstword $(MAKECMDGOALS))
 ifeq ($(DEVICE_NAME),)
 $(error No device specified.  Use "make devicename")
 endif
-ifeq ($(wildcard build/devices/$(DEVICE_NAME).mk),)
+ifeq ($(wildcard build/devices/$(DEVICE_NAME)/device.mk),)
 $(error $(DEVICE_NAME) is not a valid device.)
 endif
 
@@ -81,7 +81,7 @@ PATH := $(PWD)/$(TOOLCHAIN_NONE_EABI)/bin:$(PATH)
 #=============================================================================
 # DEVICES
 
-include $(TOPDIR)build/devices/$(DEVICE_NAME).mk
+include $(TOPDIR)build/devices/$(DEVICE_NAME)/device.mk
 
 ifeq ($(DEVICE_NAME),$(MAKECMDGOALS))
 $(DEVICE_NAME): build
@@ -94,6 +94,12 @@ endif
 
 #=============================================================================
 # GRUB
+
+# builtin modules
+GRUB_BUILTIN_MODULES = $(shell cat $(CONFIG_DIR)/modules_builtin.lst | xargs)
+ifneq ($(wildcard build/devices/$(DEVICE_NAME)/modules_builtin.lst),)
+GRUB_BUILTIN_MODULES += $(shell cat build/devices/$(DEVICE_NAME)/modules_builtin.lst | xargs)
+endif
 
 # generate Makefiles
 grub_configure: $(GRUB_DIR)/Makefile
@@ -112,7 +118,7 @@ grub_core: grub_configure
 grub_uboot: grub_core
 	qemu-arm -r 3.11 -L $(TOOLCHAIN_LINUX_GNUEABIHF_LIBC) \
 		$(GRUB_DIR)/grub-mkimage -c $(FILE_GRUB_CONFIG) -O arm-uboot -o $(FILE_UBOOT_IMAGE) \
-			-d $(GRUB_DIR)/grub-core -p /boot/grub -T $(GRUB_LOADING_ADDRESS)
+			-d $(GRUB_DIR)/grub-core -p /boot/grub -T $(GRUB_LOADING_ADDRESS) $(GRUB_BUILTIN_MODULES)
 .PHONY : grub_uboot
 
 # raw kernel

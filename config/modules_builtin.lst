@@ -1,0 +1,13 @@
+normal
+help
+echo
+ls
+reboot
+loadenv
+sleep
+test
+true
+part_gpt
+part_msdos
+fat
+ext2
