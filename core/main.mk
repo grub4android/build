@@ -40,6 +40,7 @@ endif
 
 # paths
 GRUB_DIR = $(TOPDIR)grub
+GRUB_BOOT_FS_DIR = $(TARGET_OUT)/grub/root
 LK_DIR = $(TOPDIR)lk
 OUT_DIR = $(TOPDIR)out
 CONFIG_DIR = $(TOPDIR)build/config
@@ -47,9 +48,10 @@ PREBUILTS_DIR = $(TOPDIR)prebuilts
 TARGET_OUT = $(OUT_DIR)/$(DEVICE_NAME)
 
 # files
-FILE_GRUB_KERNEL = $(TARGET_OUT)/grub_kernel.raw
+FILE_GRUB_KERNEL = $(TARGET_OUT)/grub/grub_kernel.raw
+FILE_GRUB_FILEIMAGE = $(TARGET_OUT)/grub/grub_fileimage.img
 FILE_GRUB_CONFIG = $(CONFIG_DIR)/load.cfg
-FILE_UBOOT_IMAGE = $(TARGET_OUT)/uboot.img
+FILE_UBOOT_IMAGE = $(TARGET_OUT)/grub/uboot.img
 
 # toolchain
 TOOLCHAIN_LINUX_GNUEABIHF = $(PREBUILTS_DIR)/gcc/linux-x86/arm/arm-linux-gnueabihf-4.9
@@ -63,9 +65,12 @@ ARM_CROSS_COMPILE = ARCH=arm SUBARCH=arm CROSS_COMPILE=$(TOOLCHAIN_NONE_EABI_PRE
 # create OUT_DIR
 $(shell mkdir -p $(OUT_DIR))
 $(shell mkdir -p $(TARGET_OUT))
+$(shell mkdir -p $(TARGET_OUT)/grub)
 
 # default variables
 GRUB_LOADING_ADDRESS = 0x08000000
+GRUB_FONT_SIZE = 16
+GRUB_COMPRESSION = cat
 
 # shell
 SHELL := /bin/bash
@@ -114,6 +119,24 @@ grub_uboot: grub_core
 grub_kernel: grub_uboot
 	tail -c+65 < $(FILE_UBOOT_IMAGE) > $(FILE_GRUB_KERNEL)
 .PHONY : grub_kernel
+
+# boot image
+grub_boot_fs: grub_kernel
+	# directories
+	mkdir -p $(GRUB_BOOT_FS_DIR)/boot/grub
+	mkdir -p $(GRUB_BOOT_FS_DIR)/boot/grub/fonts
+	mkdir -p $(GRUB_BOOT_FS_DIR)/boot/grub/locale
+	
+	# font
+	grub-mkfont -s $(GRUB_FONT_SIZE) -o /tmp/grub_font.pf2 /usr/share/fonts/truetype/unifont/unifont.ttf
+	cat /tmp/grub_font.pf2 | $(GRUB_COMPRESSION) > $(GRUB_BOOT_FS_DIR)/boot/grub/fonts/unicode.pf2
+	# env
+	grub-editenv $(GRUB_BOOT_FS_DIR)/boot/grub/grubenv create
+	# config
+	cp $(GRUB_DIR)/docs/grub.cfg $(GRUB_BOOT_FS_DIR)/boot/grub/
+	# kernel
+	cp $(FILE_GRUB_KERNEL) $(GRUB_BOOT_FS_DIR)/boot/grub/core.img
+.PHONY : grub_boot_fs
 
 
 #=============================================================================
