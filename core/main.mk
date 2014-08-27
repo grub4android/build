@@ -48,14 +48,15 @@ PREBUILTS_DIR = $(TOPDIR)prebuilts
 OUT_DIR = $(TOPDIR)out
 TARGET_OUT = $(OUT_DIR)/$(DEVICE_NAME)
 LK_OUT = $(TARGET_OUT)/lk
-GRUB_OUT = $(TARGET_OUT)/grub
-GRUB_BOOT_FS_DIR = $(GRUB_OUT)/rootfs
+GRUB_OUT = $(OUT_DIR)/grub
+GRUB_TARGET_OUT = $(TARGET_OUT)/grub
+GRUB_BOOT_FS_DIR = $(GRUB_TARGET_OUT)/grub_rootfs
 
 # files
-FILE_GRUB_KERNEL = $(GRUB_OUT)/grub_kernel.raw
-FILE_GRUB_FILEIMAGE = $(GRUB_OUT)/grub_fileimage.img
+FILE_GRUB_KERNEL = $(GRUB_TARGET_OUT)/grub_kernel.raw
+FILE_GRUB_FILEIMAGE = $(GRUB_TARGET_OUT)/grub_fileimage.img
 FILE_GRUB_CONFIG = $(CONFIG_DIR)/load.cfg
-FILE_UBOOT_IMAGE = $(GRUB_OUT)/uboot.img
+FILE_UBOOT_IMAGE = $(GRUB_TARGET_OUT)/uboot.img
 
 # toolchain
 TOOLCHAIN_LINUX_GNUEABIHF = $(PREBUILTS_DIR)/gcc/linux-x86/arm/arm-linux-gnueabihf-4.9
@@ -70,6 +71,7 @@ ARM_CROSS_COMPILE = ARCH=arm SUBARCH=arm CROSS_COMPILE=$(TOOLCHAIN_NONE_EABI_PRE
 $(shell mkdir -p $(OUT_DIR))
 $(shell mkdir -p $(TARGET_OUT))
 $(shell mkdir -p $(GRUB_OUT))
+$(shell mkdir -p $(GRUB_TARGET_OUT))
 
 # default variables
 GRUB_LOADING_ADDRESS = 0x08000000

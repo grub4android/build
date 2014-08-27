@@ -64,10 +64,12 @@ grub_sideload_image: grub_boot_fs
 
 grub_clean:
 	if [ -f $(GRUB_OUT)/Makefile ]; then $(MAKE) -C $(GRUB_OUT) clean; fi
+	rm -Rf $(GRUB_TARGET_OUT)/*
 .PHONY : grub_clean
 
 grub_distclean:
 	if [ -f $(GRUB_OUT)/Makefile ]; then $(MAKE) -C $(GRUB_OUT) distclean; fi
 	cat $(GRUB_DIR)/.gitignore | xargs -I{} rm -Rf $(GRUB_DIR)/{}
 	rm -Rf $(GRUB_OUT)/*
+	rm -Rf $(GRUB_TARGET_OUT)/*
 .PHONY : grub_distclean
