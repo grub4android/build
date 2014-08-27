@@ -148,6 +148,16 @@ grub_boot_fs: grub_kernel
 	cp $(FILE_GRUB_KERNEL) $(GRUB_BOOT_FS_DIR)/boot/grub/core.img
 .PHONY : grub_boot_fs
 
+grub_sideload_image: grub_boot_fs
+	# tar grub fs
+	rm -f $(TARGET_OUT)/grub_fs.tar
+	tar -cf $(TARGET_OUT)/grub_fs.tar -C $(GRUB_BOOT_FS_DIR) .
+	
+	# build sideload image
+	mkbootimg --board "GRUB" --kernel $(FILE_GRUB_KERNEL) --ramdisk $(TARGET_OUT)/grub_fs.tar \
+		--pagesize 2048 --base $$(printf "0x%x" $$(($(GRUB_LOADING_ADDRESS)-0x8000))) -o $(TARGET_OUT)/grub/grub_sideload.img
+.PHONY : grub_sideload_image
+
 
 #=============================================================================
 # CLEANUP
