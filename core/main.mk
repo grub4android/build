@@ -90,12 +90,25 @@ PATH := $(PWD)/$(TOOLCHAIN_NONE_EABI)/bin:$(PATH)
 
 include $(TOPDIR)build/devices/$(DEVICE_NAME)/device.mk
 
+# generate build targets
+BUILD_TARGETS = grub_boot_fs
+ifeq ($(ENABLE_2NDSTAGE_BOOT),1)
+BUILD_TARGETS += lk_bootimg
+else
+BUILD_TARGETS += lk
+endif
+
+# main build target
+build: $(BUILD_TARGETS)
+.PHONY : $(BUILD_TARGETS)
+
+# build targets selected via cmdline or "build"
 ifeq ($(DEVICE_NAME),$(MAKECMDGOALS))
 $(DEVICE_NAME): build
-.PHONY: $(DEVICE_NAME)
+.PHONY : $(DEVICE_NAME)
 else
 $(DEVICE_NAME):
-.PHONY: $(DEVICE_NAME)
+.PHONY : $(DEVICE_NAME)
 endif
 
 

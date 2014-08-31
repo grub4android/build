@@ -7,6 +7,3 @@ ENABLE_2NDSTAGE_BOOT = 1
 DISPLAY_WIDTH = 540
 DISPLAY_HEIGHT = 960
 DISPLAY_BPP = 24
-
-build: grub_boot_fs lk_bootimg
-.PHONY : build
