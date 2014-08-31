@@ -4,6 +4,9 @@ ifneq ($(wildcard build/devices/$(DEVICE_NAME)/modules_builtin.lst),)
 GRUB_BUILTIN_MODULES += $(shell cat build/devices/$(DEVICE_NAME)/modules_builtin.lst | xargs)
 endif
 
+# device specific grub.cfg
+GRUB_DEVICE_GRUB_CFG = build/devices/$(DEVICE_NAME)/grub.cfg
+
 # generate Makefiles
 grub_configure: $(GRUB_OUT)/Makefile
 .PHONY : grub_configure
@@ -47,7 +50,8 @@ grub_boot_fs: grub_kernel
 	# env
 	grub-editenv $(GRUB_BOOT_FS_DIR)/boot/grub/grubenv create
 	# config
-	cp $(GRUB_DIR)/docs/grub.cfg $(GRUB_BOOT_FS_DIR)/boot/grub/
+	cp $(CONFIG_DIR)/grub.cfg $(GRUB_BOOT_FS_DIR)/boot/grub/
+	sed -i -e '/{DEVICE_SPECIFIC_GRUB_CFG}/{r $(GRUB_DEVICE_GRUB_CFG)' -e 'd}' $(GRUB_BOOT_FS_DIR)/boot/grub/grub.cfg
 	# kernel
 	cp $(FILE_GRUB_KERNEL) $(GRUB_BOOT_FS_DIR)/boot/grub/core.img
 .PHONY : grub_boot_fs
