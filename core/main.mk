@@ -78,6 +78,8 @@ GRUB_LOADING_ADDRESS = 0x08000000
 GRUB_FONT_SIZE = 16
 GRUB_COMPRESSION = cat
 LK_MAKE_FLAGS =
+CLEAN_TARGETS =
+DISTCLEAN_TARGETS =
 
 # shell
 SHELL := /bin/bash
@@ -120,9 +122,9 @@ include $(TOPDIR)build/core/tasks/*.mk
 #=============================================================================
 # CLEANUP
 
-clean: grub_clean lk_clean strace_clean
+clean: $(CLEAN_TARGETS)
 .PHONY : clean
 
-distclean: grub_distclean lk_distclean strace_distclean
+distclean: $(DISTCLEAN_TARGETS)
 	rm -Rf $(TARGET_OUT)/*
 .PHONY : distclean

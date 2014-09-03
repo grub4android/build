@@ -1,3 +1,7 @@
+# cleanup targets
+CLEAN_TARGETS += strace_clean
+DISTCLEAN_TARGETS += strace_distclean
+
 # paths
 STRACE_OUT = $(OUT_DIR)/strace
 STRACE_DIR = $(TOPDIR)external/strace

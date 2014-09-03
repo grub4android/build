@@ -1,3 +1,7 @@
+# cleanup targets
+CLEAN_TARGETS += grub_clean
+DISTCLEAN_TARGETS += grub_distclean
+
 # builtin modules
 GRUB_BUILTIN_MODULES = $(shell cat $(CONFIG_DIR)/modules_builtin.lst | xargs)
 ifneq ($(wildcard build/devices/$(DEVICE_NAME)/modules_builtin.lst),)

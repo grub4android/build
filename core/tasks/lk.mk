@@ -1,3 +1,7 @@
+# cleanup targets
+CLEAN_TARGETS += lk_clean
+DISTCLEAN_TARGETS += lk_distclean
+
 # common
 LK_MAKE_FLAGS += \
 	$(ARM_CROSS_COMPILE) \
