@@ -46,7 +46,7 @@ PREBUILTS_DIR = $(TOPDIR)prebuilts
 
 # build paths
 OUT_DIR = $(TOPDIR)out
-TARGET_OUT = $(OUT_DIR)/$(DEVICE_NAME)
+TARGET_OUT = $(OUT_DIR)/target/$(DEVICE_NAME)
 LK_OUT = $(TARGET_OUT)/lk
 GRUB_OUT = $(OUT_DIR)/grub
 GRUB_TARGET_OUT = $(TARGET_OUT)/grub
