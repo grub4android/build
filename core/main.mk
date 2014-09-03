@@ -120,9 +120,9 @@ include $(TOPDIR)build/core/tasks/*.mk
 #=============================================================================
 # CLEANUP
 
-clean: grub_clean lk_clean
+clean: grub_clean lk_clean strace_clean
 .PHONY : clean
 
-distclean: grub_distclean lk_distclean
+distclean: grub_distclean lk_distclean strace_distclean
 	rm -Rf $(TARGET_OUT)/*
 .PHONY : distclean
