@@ -126,5 +126,5 @@ clean: $(CLEAN_TARGETS)
 .PHONY : clean
 
 distclean: $(DISTCLEAN_TARGETS)
-	rm -Rf $(TARGET_OUT)/*
+	rm -Rf $(OUT_DIR)
 .PHONY : distclean
