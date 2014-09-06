@@ -38,7 +38,7 @@ grub_kernel: grub_uboot
 .PHONY : grub_kernel
 
 # boot image
-grub_boot_fs: grub_kernel
+grub_boot_fs: grub_kernel multiboot
 	# cleanup
 	rm -Rf $(GRUB_BOOT_FS_DIR)/boot/grub
 	rm -f /tmp/grub_font.pf2
@@ -58,6 +58,8 @@ grub_boot_fs: grub_kernel
 	sed -i -e '/{DEVICE_SPECIFIC_GRUB_CFG}/{r $(GRUB_DEVICE_GRUB_CFG)' -e 'd}' $(GRUB_BOOT_FS_DIR)/boot/grub/grub.cfg
 	# kernel
 	cp $(FILE_GRUB_KERNEL) $(GRUB_BOOT_FS_DIR)/boot/grub/core.img
+	# multiboot
+	cp -R $(MULTIBOOT_BOOTFS) $(GRUB_BOOT_FS_DIR)/boot/grub/multiboot
 .PHONY : grub_boot_fs
 
 grub_sideload_image: grub_boot_fs

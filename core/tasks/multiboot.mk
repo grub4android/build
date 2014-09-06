@@ -1,72 +1,74 @@
 # cleanup targets
-CLEAN_TARGETS += strace_clean libmultiboot_clean
-DISTCLEAN_TARGETS += strace_distclean libmultiboot_distclean
+CLEAN_TARGETS += tracy_clean multiboot_clean
+DISTCLEAN_TARGETS += tracy_distclean multiboot_distclean
 
 # paths
-STRACE_OUT = $(OUT_DIR)/strace
-STRACE_DIR = $(TOPDIR)external/strace
-LIBMULTIBOOT_OUT = $(OUT_DIR)/multiboot
-LIBMULTIBOOT_DIR = $(TOPDIR)multiboot
+TRACY_OUT = $(OUT_DIR)/tracy
+TRACY_DIR = $(TOPDIR)external/tracy/src
+MULTIBOOT_OUT = $(OUT_DIR)/multiboot
+MULTIBOOT_DIR = $(TOPDIR)multiboot
+MULTIBOOT_BOOTFS = $(OUT_DIR)/multiboot/bootfs
 
 # create out dir
-$(shell mkdir -p $(STRACE_OUT))
-$(shell mkdir -p $(LIBMULTIBOOT_OUT))
+$(shell mkdir -p $(TRACY_OUT))
+$(shell mkdir -p $(MULTIBOOT_OUT))
+$(shell mkdir -p $(MULTIBOOT_BOOTFS))
 
 #=============================================================================
-# STRACE
+# TRACY
 
 # generate Makefiles
-strace_configure: $(STRACE_OUT)/Makefile
-.PHONY : strace_configure
-$(STRACE_OUT)/Makefile:
-	@ cd $(STRACE_DIR) && \
-	./bootstrap && \
-	cd $(PWD)/$(STRACE_OUT) && \
-	CFLAGS="-O2 -static" \
-		$(PWD)/$(STRACE_DIR)/configure --host $(TOOLCHAIN_LINUX_GNUEABIHF_HOST)
+tracy_configure: $(TRACY_OUT)/Makefile
+.PHONY : tracy_configure
+$(TRACY_OUT)/Makefile:
+	@ cd $(TRACY_OUT) && \
+	STATIC_COMPILE=1 \
+		cmake \
+		-DCMAKE_C_COMPILER=$(TOOLCHAIN_LINUX_GNUEABIHF_HOST)-gcc \
+		-DCMAKE_CXX_COMPILER=$(TOOLCHAIN_LINUX_GNUEABIHF_HOST)-g++ \
+			$(PWD)/$(TRACY_DIR)
 
 # main build
-strace: strace_configure
-	$(MAKE) -C $(STRACE_OUT)
-.PHONY : strace
+tracy: tracy_configure
+	$(MAKE) -C $(TRACY_OUT)
+.PHONY : tracy
 
 # cleanup
-strace_clean:
-	if [ -f $(STRACE_OUT)/Makefile ]; then $(MAKE) -C $(STRACE_OUT) clean; fi
-.PHONY : strace_clean
+tracy_clean:
+	if [ -f $(TRACY_OUT)/Makefile ]; then $(MAKE) -C $(TRACY_OUT) clean; fi
+.PHONY : tracy_clean
 
-strace_distclean:
-	if [ -f $(STRACE_OUT)/Makefile ]; then $(MAKE) -C $(STRACE_OUT) distclean; fi
-	git -C $(STRACE_DIR)/ clean -dfX
-	rm -Rf $(STRACE_OUT)/*
-.PHONY : strace_distclean
+tracy_distclean:
+	rm -Rf $(TRACY_OUT)/*
+.PHONY : tracy_distclean
 
 
 #=============================================================================
-# LIBMULTIBOOT
+# MULTIBOOT
 
 # generate Makefiles
-libmultiboot_configure: $(LIBMULTIBOOT_OUT)/Makefile
-.PHONY : libmultiboot_configure
- $(LIBMULTIBOOT_OUT)/Makefile:
-	@ cd $(LIBMULTIBOOT_OUT) && \
+multiboot_configure: $(MULTIBOOT_OUT)/Makefile
+.PHONY : multiboot_configure
+ $(MULTIBOOT_OUT)/Makefile:
+	@ cd $(MULTIBOOT_OUT) && \
 	cmake \
 		-DCMAKE_C_COMPILER=$(TOOLCHAIN_LINUX_GNUEABIHF_HOST)-gcc \
 		-DCMAKE_CXX_COMPILER=$(TOOLCHAIN_LINUX_GNUEABIHF_HOST)-g++ \
-		-DSTRACE_BIN_DIR=$(PWD)/$(STRACE_OUT) \
-		-DSTRACE_SRC_DIR=$(PWD)/$(STRACE_DIR) \
-		$(PWD)/$(LIBMULTIBOOT_DIR)
+		-DTRACY_BIN_DIR=$(PWD)/$(TRACY_OUT) \
+		-DTRACY_SRC_DIR=$(PWD)/$(TRACY_DIR) \
+		$(PWD)/$(MULTIBOOT_DIR)
 
 # main build
-libmultiboot: libmultiboot_configure strace
-	$(MAKE) -C $(LIBMULTIBOOT_OUT)
-.PHONY : libmultiboot
+multiboot: multiboot_configure tracy
+	$(MAKE) -C $(MULTIBOOT_OUT)
+	cp $(MULTIBOOT_OUT)/init $(MULTIBOOT_BOOTFS)/
+.PHONY : multiboot
 
 # cleanup
-libmultiboot_clean:
-	if [ -f $(LIBMULTIBOOT_OUT)/Makefile ]; then $(MAKE) -C $(LIBMULTIBOOT_OUT) clean; fi
-.PHONY : libmultiboot_clean
+multiboot_clean:
+	if [ -f $(MULTIBOOT_OUT)/Makefile ]; then $(MAKE) -C $(MULTIBOOT_OUT) clean; fi
+.PHONY : multiboot_clean
 
-libmultiboot_distclean:
-	rm -Rf $(LIBMULTIBOOT_OUT)/*
-.PHONY : libmultiboot_distclean
+multiboot_distclean:
+	rm -Rf $(MULTIBOOT_OUT)/*
+.PHONY : multiboot_distclean
