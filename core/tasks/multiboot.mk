@@ -56,12 +56,14 @@ multiboot_configure: $(MULTIBOOT_OUT)/Makefile
 		-DCMAKE_CXX_COMPILER=$(TOOLCHAIN_LINUX_GNUEABIHF_HOST)-g++ \
 		-DTRACY_BIN_DIR=$(PWD)/$(TRACY_OUT) \
 		-DTRACY_SRC_DIR=$(PWD)/$(TRACY_DIR) \
+		-DBB_BIN_DIR=$(PWD)/$(BUSYBOX_OUT) \
 		$(PWD)/$(MULTIBOOT_DIR)
 
 # main build
-multiboot: multiboot_configure tracy
+multiboot: multiboot_configure tracy busybox
 	$(MAKE) -C $(MULTIBOOT_OUT)
 	cp $(MULTIBOOT_OUT)/init $(MULTIBOOT_BOOTFS)/
+	cp $(BUSYBOX_OUT)/busybox $(MULTIBOOT_BOOTFS)/
 .PHONY : multiboot
 
 # cleanup
