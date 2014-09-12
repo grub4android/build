@@ -64,6 +64,7 @@ multiboot: multiboot_configure tracy busybox
 	$(MAKE) -C $(MULTIBOOT_OUT)
 	cp $(MULTIBOOT_OUT)/init $(MULTIBOOT_BOOTFS)/
 	cp $(BUSYBOX_OUT)/busybox $(MULTIBOOT_BOOTFS)/
+	cp build/devices/$(DEVICE_NAME)/fstab $(MULTIBOOT_BOOTFS)/
 .PHONY : multiboot
 
 # cleanup
