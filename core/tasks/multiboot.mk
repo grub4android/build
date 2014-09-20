@@ -63,6 +63,7 @@ multiboot_configure: $(MULTIBOOT_OUT)/Makefile
 multiboot: multiboot_configure tracy busybox e2fsprogs
 	$(MAKE) -C $(MULTIBOOT_OUT)
 	cp $(MULTIBOOT_OUT)/init $(MULTIBOOT_BOOTFS)/
+	cp $(MULTIBOOT_DIR)/prebuilt/* $(MULTIBOOT_BOOTFS)/
 	cp $(BUSYBOX_OUT)/busybox $(MULTIBOOT_BOOTFS)/
 	cp $(E2FSPROGS_OUT)/e2fsck/e2fsck $(MULTIBOOT_BOOTFS)/
 	cp build/devices/$(DEVICE_NAME)/fstab $(MULTIBOOT_BOOTFS)/
