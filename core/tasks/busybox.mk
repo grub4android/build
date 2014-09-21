@@ -15,12 +15,13 @@ $(shell mkdir -p $(BUSYBOX_OUT))
 BUSYBOX_CC=CROSS_COMPILE=$(TOOLCHAIN_LINUX_GNUEABIHF_HOST)-
 
 # generate config
-$(BUSYBOX_OUT)/.config:
+busybox_defconfig:
 	cp $(CONFIG_DIR)/busybox_defconfig $(BUSYBOX_OUT)/.config
-	CONFIG_STATIC=y $(BUSYBOX_CC) $(MAKE) -C $(BUSYBOX_DIR) O=$(PWD)/$(BUSYBOX_OUT) oldconfig
+	$(BUSYBOX_CC) $(MAKE) -C $(BUSYBOX_DIR) O=$(PWD)/$(BUSYBOX_OUT) oldconfig
+.PHONY : busybox_defconfig
 
 # main build
-busybox: $(BUSYBOX_OUT)/.config
+busybox: busybox_defconfig
 	$(BUSYBOX_CC) $(MAKE) -C $(BUSYBOX_DIR) O=$(PWD)/$(BUSYBOX_OUT)
 .PHONY : busybox
 
