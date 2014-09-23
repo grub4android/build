@@ -9,5 +9,5 @@ fi
 
 export DIR_TOOLS=$(dirname $(realpath "$0"))
 
-find "$FOLDER" -name "*.c" -or -name "*.h" | xargs -I{} sh -c '$DIR_TOOLS/Lindent "{}"; rm "{}"~;'
+find "$FOLDER" -type f \( -name "*.c" -or -name "*.h" \) -not -path "*/libblkid/*" | xargs -I{} sh -c '$DIR_TOOLS/Lindent "{}"; rm "{}"~;'
 
