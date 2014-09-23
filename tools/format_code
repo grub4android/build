@@ -1,0 +1,13 @@
+#!/bin/sh
+
+FOLDER=$1
+
+if [ -z "$FOLDER" ];then
+	echo "You need to provide the path to the folder to format!"
+	exit 1
+fi
+
+export DIR_TOOLS=$(dirname $(realpath "$0"))
+
+find "$FOLDER" -name "*.c" -or -name "*.h" | xargs -I{} sh -c '$DIR_TOOLS/Lindent "{}"; rm "{}"~;'
+
