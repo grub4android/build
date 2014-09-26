@@ -30,6 +30,11 @@ LK_MAKE_FLAGS += \
 	MEMBASE=$(LK_LOADING_ADDRESS)
 endif
 
+# DT
+LK_MKBOOTIMG_ADDITIONAL_FLAGS=
+ifneq ($(LK_DT_IMG),)
+LK_MKBOOTIMG_ADDITIONAL_FLAGS+=--dt $(LK_DT_IMG)
+endif
 
 lk:
 	$(LK_MAKE_FLAGS) \
@@ -37,7 +42,7 @@ lk:
 .PHONY : lk
 
 lk_bootimg: lk mkbootimg
-	$(MKBOOTIMG)  --kernel $(LK_OUT)/build-$(LK_TARGET_NAME)/lk.bin --ramdisk /dev/zero \
+	$(MKBOOTIMG)  --kernel $(LK_OUT)/build-$(LK_TARGET_NAME)/lk.bin --ramdisk /dev/zero $(LK_MKBOOTIMG_ADDITIONAL_FLAGS) \
 		--pagesize 2048 --base $$(printf "0x%x" $$(($(LK_LOADING_ADDRESS)-0x8000))) -o $(TARGET_OUT)/lkboot.img
 .PHONY : lk_bootimg
 
