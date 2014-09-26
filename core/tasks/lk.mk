@@ -36,8 +36,8 @@ lk:
 		$(MAKE) -C $(LK_DIR) $(LK_TARGET_NAME)
 .PHONY : lk
 
-lk_bootimg: lk
-	mkbootimg  --kernel $(LK_OUT)/build-$(LK_TARGET_NAME)/lk.bin --ramdisk /dev/zero \
+lk_bootimg: lk mkbootimg
+	$(MKBOOTIMG)  --kernel $(LK_OUT)/build-$(LK_TARGET_NAME)/lk.bin --ramdisk /dev/zero \
 		--pagesize 2048 --base $$(printf "0x%x" $$(($(LK_LOADING_ADDRESS)-0x8000))) -o $(TARGET_OUT)/lkboot.img
 .PHONY : lk_bootimg
 
