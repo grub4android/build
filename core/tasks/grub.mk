@@ -49,8 +49,8 @@ grub_boot_fs: grub_kernel multiboot
 	mkdir -p $(GRUB_BOOT_FS_DIR)/boot/grub/locale
 	
 	# font
-	grub-mkfont -s $(GRUB_FONT_SIZE) -o /tmp/grub_font.pf2 /usr/share/fonts/truetype/unifont/unifont.ttf
-	cat /tmp/grub_font.pf2 | $(GRUB_COMPRESSION) > $(GRUB_BOOT_FS_DIR)/boot/grub/fonts/unicode.pf2
+	grub-mkfont -s $(GRUB_FONT_SIZE) -o $(GRUB_TARGET_OUT)/unifont_uncompressed.pf2 $(PREBUILTS_DIR)/unifont/unifont.ttf
+	cat $(GRUB_TARGET_OUT)/unifont_uncompressed.pf2 | $(GRUB_COMPRESSION) > $(GRUB_BOOT_FS_DIR)/boot/grub/fonts/unicode.pf2
 	# env
 	grub-editenv $(GRUB_BOOT_FS_DIR)/boot/grub/grubenv create
 	# config
