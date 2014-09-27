@@ -2,6 +2,18 @@
 CLEAN_TARGETS += grub_clean
 DISTCLEAN_TARGETS += grub_distclean
 
+# paths
+GRUB_DIR = $(TOPDIR)grub
+GRUB_OUT = $(TARGET_COMMON_OUT)/grub
+GRUB_TARGET_OUT = $(TARGET_OUT)/grub
+GRUB_BOOT_FS_DIR = $(GRUB_TARGET_OUT)/grub_rootfs
+
+# files
+FILE_GRUB_KERNEL = $(GRUB_TARGET_OUT)/grub_kernel.raw
+FILE_GRUB_FILEIMAGE = $(GRUB_TARGET_OUT)/grub_fileimage.img
+FILE_GRUB_CONFIG = $(CONFIG_DIR)/load.cfg
+FILE_UBOOT_IMAGE = $(GRUB_TARGET_OUT)/uboot.img
+
 # builtin modules
 GRUB_BUILTIN_MODULES = $(shell cat $(CONFIG_DIR)/modules_builtin.lst | xargs)
 ifneq ($(wildcard build/devices/$(DEVICE_NAME)/modules_builtin.lst),)
@@ -10,6 +22,10 @@ endif
 
 # device specific grub.cfg
 GRUB_DEVICE_GRUB_CFG = build/devices/$(DEVICE_NAME)/grub.cfg
+
+# create out directories
+$(shell mkdir -p $(GRUB_OUT))
+$(shell mkdir -p $(GRUB_TARGET_OUT))
 
 # generate Makefiles
 grub_configure: $(GRUB_OUT)/Makefile

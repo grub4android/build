@@ -2,8 +2,15 @@
 CLEAN_TARGETS += lk_clean
 DISTCLEAN_TARGETS += lk_distclean
 
+# paths
+LK_DIR = $(TOPDIR)lk
+LK_OUT = $(TARGET_OUT)/lk
+
+# create out directories
+$(shell mkdir -p $(LK_OUT))
+
 # common
-LK_MAKE_FLAGS += \
+LK_MAKE_FLAGS = \
 	$(ARM_CROSS_COMPILE) \
 	GRUB_LOADING_ADDRESS=$(GRUB_LOADING_ADDRESS) \
 	GRUB_BOOT_PARTITION=$(GRUB_BOOT_PARTITION) \

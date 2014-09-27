@@ -39,24 +39,14 @@ $(error $(DEVICE_NAME) is not a valid device.)
 endif
 
 # src paths
-GRUB_DIR = $(TOPDIR)grub
-LK_DIR = $(TOPDIR)lk
 CONFIG_DIR = $(TOPDIR)build/config
 PREBUILTS_DIR = $(TOPDIR)prebuilts
 
 # build paths
 OUT_DIR = $(TOPDIR)out
 TARGET_OUT = $(OUT_DIR)/target/$(DEVICE_NAME)
-LK_OUT = $(TARGET_OUT)/lk
-GRUB_OUT = $(OUT_DIR)/grub
-GRUB_TARGET_OUT = $(TARGET_OUT)/grub
-GRUB_BOOT_FS_DIR = $(GRUB_TARGET_OUT)/grub_rootfs
-
-# files
-FILE_GRUB_KERNEL = $(GRUB_TARGET_OUT)/grub_kernel.raw
-FILE_GRUB_FILEIMAGE = $(GRUB_TARGET_OUT)/grub_fileimage.img
-FILE_GRUB_CONFIG = $(CONFIG_DIR)/load.cfg
-FILE_UBOOT_IMAGE = $(GRUB_TARGET_OUT)/uboot.img
+TARGET_COMMON_OUT = $(OUT_DIR)/target/common
+HOST_OUT = $(OUT_DIR)/host
 
 # toolchain
 TOOLCHAIN_LINUX_GNUEABIHF = $(PREBUILTS_DIR)/gcc/linux-x86/arm/arm-linux-gnueabihf-4.9
@@ -67,17 +57,16 @@ TOOLCHAIN_NONE_EABI = $(PREBUILTS_DIR)/gcc/linux-x86/arm/arm-none-eabi-4.9
 TOOLCHAIN_NONE_EABI_PREFIX = arm-none-eabi-
 ARM_CROSS_COMPILE = ARCH=arm SUBARCH=arm CROSS_COMPILE=$(TOOLCHAIN_NONE_EABI_PREFIX) TOOLCHAIN_PREFIX=$$CROSS_COMPILE
 
-# create OUT_DIR
+# create out directories
 $(shell mkdir -p $(OUT_DIR))
 $(shell mkdir -p $(TARGET_OUT))
-$(shell mkdir -p $(GRUB_OUT))
-$(shell mkdir -p $(GRUB_TARGET_OUT))
+$(shell mkdir -p $(TARGET_COMMON_OUT))
+$(shell mkdir -p $(HOST_OUT))
 
 # default variables
 GRUB_LOADING_ADDRESS = 0x08000000
 GRUB_FONT_SIZE = 16
 GRUB_COMPRESSION = cat
-LK_MAKE_FLAGS =
 CLEAN_TARGETS =
 DISTCLEAN_TARGETS =
 

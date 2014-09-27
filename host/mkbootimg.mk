@@ -3,7 +3,7 @@ CLEAN_TARGETS += mkbootimg_clean
 DISTCLEAN_TARGETS += mkbootimg_distclean
 
 # paths
-MKBOOTIMG_OUT = $(OUT_DIR)/mkbootimg
+MKBOOTIMG_OUT = $(HOST_OUT)/mkbootimg
 MKBOOTIMG_DIR = $(TOPDIR)external/mkbootimg
 
 # binary

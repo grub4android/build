@@ -3,7 +3,7 @@ CLEAN_TARGETS += busybox_clean
 DISTCLEAN_TARGETS += busybox_distclean
 
 # paths
-BUSYBOX_OUT = $(OUT_DIR)/busybox
+BUSYBOX_OUT = $(TARGET_COMMON_OUT)/busybox
 BUSYBOX_DIR = $(TOPDIR)external/busybox
 
 # create out dir

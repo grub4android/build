@@ -3,11 +3,11 @@ CLEAN_TARGETS += tracy_clean multiboot_clean
 DISTCLEAN_TARGETS += tracy_distclean multiboot_distclean
 
 # paths
-TRACY_OUT = $(OUT_DIR)/tracy
+TRACY_OUT = $(TARGET_COMMON_OUT)/tracy
 TRACY_DIR = $(TOPDIR)external/tracy/src
-MULTIBOOT_OUT = $(OUT_DIR)/multiboot
+MULTIBOOT_OUT = $(TARGET_COMMON_OUT)/multiboot
 MULTIBOOT_DIR = $(TOPDIR)multiboot
-MULTIBOOT_BOOTFS = $(OUT_DIR)/multiboot/bootfs
+MULTIBOOT_BOOTFS = $(MULTIBOOT_DIR)/bootfs
 
 # create out dir
 $(shell mkdir -p $(TRACY_OUT))

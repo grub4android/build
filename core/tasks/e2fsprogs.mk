@@ -3,7 +3,7 @@ CLEAN_TARGETS += e2fsprogs_clean
 DISTCLEAN_TARGETS += e2fsprogs_distclean
 
 # paths
-E2FSPROGS_OUT = $(OUT_DIR)/e2fsprogs
+E2FSPROGS_OUT = $(TARGET_COMMON_OUT)/e2fsprogs
 E2FSPROGS_DIR = $(TOPDIR)external/e2fsprogs
 
 # create out dir
