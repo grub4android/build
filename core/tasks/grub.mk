@@ -20,6 +20,15 @@ ifneq ($(wildcard build/devices/$(DEVICE_NAME)/modules_builtin.lst),)
 GRUB_BUILTIN_MODULES += $(shell cat build/devices/$(DEVICE_NAME)/modules_builtin.lst | xargs)
 endif
 
+# grub/grub2
+ifneq (, $(shell which grub2-mkfont))
+GRUB_TOOL_PREFIX=grub2
+else ifneq (, $(shell which grub-mkfont))
+GRUB_TOOL_PREFIX=grub
+else
+$(error "Couldn't find grub(2) tools")
+endif
+
 # device specific grub.cfg
 GRUB_DEVICE_GRUB_CFG = build/devices/$(DEVICE_NAME)/grub.cfg
 
@@ -65,10 +74,10 @@ grub_boot_fs: grub_kernel multiboot
 	mkdir -p $(GRUB_BOOT_FS_DIR)/boot/grub/locale
 	
 	# font
-	grub-mkfont -s $(GRUB_FONT_SIZE) -o $(GRUB_TARGET_OUT)/unifont_uncompressed.pf2 $(PREBUILTS_DIR)/unifont/unifont.ttf
+	$(GRUB_TOOL_PREFIX)-mkfont -s $(GRUB_FONT_SIZE) -o $(GRUB_TARGET_OUT)/unifont_uncompressed.pf2 $(PREBUILTS_DIR)/unifont/unifont.ttf
 	cat $(GRUB_TARGET_OUT)/unifont_uncompressed.pf2 | $(GRUB_COMPRESSION) > $(GRUB_BOOT_FS_DIR)/boot/grub/fonts/unicode.pf2
 	# env
-	grub-editenv $(GRUB_BOOT_FS_DIR)/boot/grub/grubenv create
+	$(GRUB_TOOL_PREFIX)-editenv $(GRUB_BOOT_FS_DIR)/boot/grub/grubenv create
 	# config
 	cp $(CONFIG_DIR)/grub.cfg $(GRUB_BOOT_FS_DIR)/boot/grub/
 	sed -i -e '/{DEVICE_SPECIFIC_GRUB_CFG}/{r $(GRUB_DEVICE_GRUB_CFG)' -e 'd}' $(GRUB_BOOT_FS_DIR)/boot/grub/grub.cfg
