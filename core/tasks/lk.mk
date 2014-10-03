@@ -15,7 +15,8 @@ LK_MAKE_FLAGS = \
 	GRUB_LOADING_ADDRESS=$(GRUB_LOADING_ADDRESS) \
 	GRUB_BOOT_PARTITION=$(GRUB_BOOT_PARTITION) \
 	GRUB_BOOT_PATH_PREFIX=$(GRUB_BOOT_PATH_PREFIX) \
-	BOOTLOADER_OUT=$(PWD)/$(LK_OUT)
+	BOOTLOADER_OUT=$(PWD)/$(LK_OUT) \
+	LKFONT_HEADER=$(PWD)/$(LK_OUT)/lkfont.h
 
 # 2ndstage
 ifneq ($(ENABLE_2NDSTAGE_BOOT),)
@@ -44,7 +45,14 @@ ifneq ($(LK_DT_IMG),)
 LK_MKBOOTIMG_ADDITIONAL_FLAGS+=--dt $(LK_DT_IMG)
 endif
 
-lk:
+lk_font:
+	$(GRUB_TOOL_PREFIX)-mkfont -s $$(build/tools/font_inch_to_px $(DISPLAY_PPI) "0.11") \
+		-o $(LK_OUT)/lkfont.pf2 --range=0x0-0x7f $(PREBUILTS_DIR)/unifont/unifont.ttf
+	@ cd $(LK_OUT) && \
+		xxd -i lkfont.pf2 > lkfont.h
+.PHONY : lk_font
+
+lk: lk_font
 	$(LK_MAKE_FLAGS) \
 		$(MAKE) -C $(LK_DIR) $(LK_TARGET_NAME)
 .PHONY : lk
