@@ -1,0 +1,26 @@
+#!/bin/sh
+
+# ARGS
+FILE_PNG="$1"
+RESOLUTION="$2"
+
+if [ -z "$FILE_PNG" ];then
+	echo "You need to provide a output filename!"
+	exit 1
+fi
+
+if [ -z "$RESOLUTION" ];then
+	echo "You need to provide a resolution!"
+	exit 1
+fi
+
+# variables
+FILE_RAW="$1.raw"
+FOLDER_TOOLS=$(dirname $(realpath $0))
+FOLDER_PREBUILTS="$FOLDER_TOOLS/../../prebuilts"
+FASTBOOT="$FOLDER_PREBUILTS/fastboot"
+
+# dump and convert image
+$FASTBOOT dump "$FILE_RAW" oem screenshot
+convert -depth 8 -size "$RESOLUTION" bgr:"$FILE_RAW" "$FILE_PNG"
+rm "$FILE_RAW"
