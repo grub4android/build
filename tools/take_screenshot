@@ -10,8 +10,7 @@ if [ -z "$FILE_PNG" ];then
 fi
 
 if [ -z "$RESOLUTION" ];then
-	echo "You need to provide a resolution!"
-	exit 1
+	RESOLUTION=$(fastboot getvar screen-resolution 2>&1 | head -1 | cut -d' ' -f2)
 fi
 
 # variables
