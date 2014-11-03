@@ -54,7 +54,7 @@ grub_core: grub_configure
 grub_uboot: grub_core
 	qemu-arm -r 3.11 -L $(TOOLCHAIN_LINUX_GNUEABIHF_LIBC) \
 		$(GRUB_OUT)/grub-mkimage -c $(FILE_GRUB_CONFIG) -O arm-uboot -o $(FILE_UBOOT_IMAGE) \
-			-d $(GRUB_OUT)/grub-core -p /boot/grub -T $(GRUB_LOADING_ADDRESS_VIRT) $(GRUB_BUILTIN_MODULES)
+			-d $(GRUB_OUT)/grub-core -p /boot/grub -T $(GRUB_LOADING_ADDRESS) $(GRUB_BUILTIN_MODULES)
 .PHONY : grub_uboot
 
 # raw kernel
@@ -95,7 +95,7 @@ grub_sideload_image: grub_boot_fs mkbootimg
 	# build sideload image
 	$(MKBOOTIMG) --board "GRUB" --kernel $(FILE_GRUB_KERNEL) --ramdisk $(TARGET_OUT)/grub_fs.tar \
 		--ramdisk_offset 0x2000000 \
-		--pagesize 2048 --base $$(printf "0x%x" $$(($(GRUB_LOADING_ADDRESS_VIRT)-0x8000))) -o $(TARGET_OUT)/grub/grub_sideload.img
+		--pagesize 2048 --base $$(printf "0x%x" $$(($(GRUB_LOADING_ADDRESS)-0x8000))) -o $(TARGET_OUT)/grub/grub_sideload.img
 .PHONY : grub_sideload_image
 
 grub_clean:
