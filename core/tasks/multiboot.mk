@@ -7,7 +7,7 @@ TRACY_OUT = $(TARGET_COMMON_OUT)/tracy
 TRACY_DIR = $(TOPDIR)external/tracy/src
 MULTIBOOT_OUT = $(TARGET_COMMON_OUT)/multiboot
 MULTIBOOT_DIR = $(TOPDIR)multiboot
-MULTIBOOT_BOOTFS = $(MULTIBOOT_DIR)/bootfs
+MULTIBOOT_BOOTFS = $(MULTIBOOT_OUT)/bootfs
 
 # create out dir
 $(shell mkdir -p $(TRACY_OUT))
