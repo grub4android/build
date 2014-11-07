@@ -51,17 +51,18 @@ multiboot_configure: $(MULTIBOOT_OUT)/Makefile
 .PHONY : multiboot_configure
  $(MULTIBOOT_OUT)/Makefile:
 	@ cd $(MULTIBOOT_OUT) && \
-	SELINUX_OUT=$(PWD)/$(SELINUX_OUT) \
 	cmake \
 		-DCMAKE_C_COMPILER=$(TOOLCHAIN_LINUX_GNUEABIHF_HOST)-gcc \
 		-DCMAKE_CXX_COMPILER=$(TOOLCHAIN_LINUX_GNUEABIHF_HOST)-g++ \
 		-DTRACY_BIN_DIR=$(PWD)/$(TRACY_OUT) \
 		-DTRACY_SRC_DIR=$(PWD)/$(TRACY_DIR) \
 		-DBB_BIN_DIR=$(PWD)/$(BUSYBOX_OUT) \
+		-DSELINUX_BIN_DIR=$(PWD)/$(SELINUX_OUT) \
+		-DSELINUX_SRC_DIR=$(PWD)/$(SELINUX_DIR) \
 		$(PWD)/$(MULTIBOOT_DIR)
 
 # main build
-multiboot: multiboot_configure tracy busybox e2fsprogs selinux
+multiboot: multiboot_configure tracy selinux busybox e2fsprogs
 	$(MAKE) -C $(MULTIBOOT_OUT)
 	cp $(MULTIBOOT_OUT)/init $(MULTIBOOT_BOOTFS)/
 	cp $(MULTIBOOT_DIR)/prebuilt/* $(MULTIBOOT_BOOTFS)/
