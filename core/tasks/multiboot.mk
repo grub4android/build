@@ -69,7 +69,6 @@ multiboot: multiboot_configure tracy selinux busybox e2fsprogs
 	mkdir $(MULTIBOOT_BOOTFS)/etc/
 	
 	cp $(MULTIBOOT_OUT)/init $(MULTIBOOT_BOOTFS)/sbin/
-	cp $(MULTIBOOT_DIR)/prebuilt/* $(MULTIBOOT_BOOTFS)/sbin/
 	cp $(BUSYBOX_OUT)/busybox $(MULTIBOOT_BOOTFS)/sbin/
 	cp $(E2FSPROGS_OUT)/e2fsck/e2fsck.stripped $(MULTIBOOT_BOOTFS)/sbin/e2fsck
 	cp $(E2FSPROGS_OUT)/misc/mke2fs $(MULTIBOOT_BOOTFS)/sbin/mke2fs
