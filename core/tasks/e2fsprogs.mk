@@ -24,6 +24,7 @@ $(E2FSPROGS_OUT)/Makefile:
 e2fsprogs: e2fsprogs_configure
 	$(MAKE) -C $(E2FSPROGS_OUT)
 	$(TOOLCHAIN_LINUX_GNUEABIHF_HOST)-strip -o $(E2FSPROGS_OUT)/e2fsck/e2fsck.stripped $(E2FSPROGS_OUT)/e2fsck/e2fsck
+	$(TOOLCHAIN_LINUX_GNUEABIHF_HOST)-strip -o $(E2FSPROGS_OUT)/misc/mke2fs.stripped $(E2FSPROGS_OUT)/misc/mke2fs
 .PHONY : e2fsprogs
 
 # cleanup
