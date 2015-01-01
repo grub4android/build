@@ -54,7 +54,7 @@ grub_core: grub_configure
 grub_uboot: grub_core
 	qemu-arm -r 3.11 -L $(TOOLCHAIN_LINUX_GNUEABIHF_LIBC) \
 		$(GRUB_OUT)/grub-mkimage -c $(FILE_GRUB_CONFIG) -O arm-uboot -o $(FILE_UBOOT_IMAGE) \
-			-d $(GRUB_OUT)/grub-core -p /boot/grub -T $(GRUB_LOADING_ADDRESS) $(GRUB_BUILTIN_MODULES)
+			-d $(GRUB_OUT)/grub-core -p NULL -T $(GRUB_LOADING_ADDRESS) $(GRUB_BUILTIN_MODULES)
 .PHONY : grub_uboot
 
 # raw kernel
@@ -65,35 +65,36 @@ grub_kernel: grub_uboot
 # boot image
 grub_boot_fs: grub_kernel multiboot
 	# cleanup
-	rm -Rf $(GRUB_BOOT_FS_DIR)/boot/grub
+	rm -Rf $(GRUB_BOOT_FS_DIR)/*
 	rm -f /tmp/grub_font.pf2
 	
 	# directories
-	mkdir -p $(GRUB_BOOT_FS_DIR)/boot/grub
-	mkdir -p $(GRUB_BOOT_FS_DIR)/boot/grub/fonts
-	mkdir -p $(GRUB_BOOT_FS_DIR)/boot/grub/locale
+	mkdir -p $(GRUB_BOOT_FS_DIR)/grub
+	mkdir -p $(GRUB_BOOT_FS_DIR)/grub/fonts
+	mkdir -p $(GRUB_BOOT_FS_DIR)/grub/locale
 	
 	# font
 	$(GRUB_TOOL_PREFIX)-mkfont -s $$(build/tools/font_inch_to_px $(DISPLAY_PPI) "0.11") -o $(GRUB_TARGET_OUT)/unifont_uncompressed.pf2 $(PREBUILTS_DIR)/unifont/unifont.ttf
-	cat $(GRUB_TARGET_OUT)/unifont_uncompressed.pf2 | $(GRUB_COMPRESSION) > $(GRUB_BOOT_FS_DIR)/boot/grub/fonts/unicode.pf2
+	cat $(GRUB_TARGET_OUT)/unifont_uncompressed.pf2 | $(GRUB_COMPRESSION) > $(GRUB_BOOT_FS_DIR)/grub/fonts/unicode.pf2
 	# env
-	$(GRUB_TOOL_PREFIX)-editenv $(GRUB_BOOT_FS_DIR)/boot/grub/grubenv create
+	$(GRUB_TOOL_PREFIX)-editenv $(GRUB_BOOT_FS_DIR)/grub/grubenv create
 	# config
-	cp $(CONFIG_DIR)/grub.cfg $(GRUB_BOOT_FS_DIR)/boot/grub/
-	sed -i -e '/{DEVICE_SPECIFIC_GRUB_CFG}/{r $(GRUB_DEVICE_GRUB_CFG)' -e 'd}' $(GRUB_BOOT_FS_DIR)/boot/grub/grub.cfg
+	cp $(CONFIG_DIR)/grub.cfg $(GRUB_BOOT_FS_DIR)/grub/
+	sed -i -e '/{DEVICE_SPECIFIC_GRUB_CFG}/{r $(GRUB_DEVICE_GRUB_CFG)' -e 'd}' $(GRUB_BOOT_FS_DIR)/grub/grub.cfg
 	# kernel
-	cp $(FILE_GRUB_KERNEL) $(GRUB_BOOT_FS_DIR)/boot/grub/core.img
+	cp $(FILE_GRUB_KERNEL) $(GRUB_BOOT_FS_DIR)/grub/core.img
 	# multiboot
-	cp -R $(MULTIBOOT_BOOTFS) $(GRUB_BOOT_FS_DIR)/boot/grub/multiboot
+	cp -R $(MULTIBOOT_BOOTFS) $(GRUB_BOOT_FS_DIR)/multiboot
 .PHONY : grub_boot_fs
 
 grub_sideload_image: grub_boot_fs mkbootimg
 	# tar grub fs
-	rm -f $(TARGET_OUT)/grub_fs.tar
-	tar -cf $(TARGET_OUT)/grub_fs.tar -C $(GRUB_BOOT_FS_DIR) .
+	rm -f $(TARGET_OUT)/grub_fs.cpio
+	cd $(GRUB_BOOT_FS_DIR) && \
+		find . | cpio -o -H newc -R root:root > $(PWD)/$(TARGET_OUT)/grub_fs.cpio
 	
 	# build sideload image
-	$(MKBOOTIMG) --board "GRUB" --kernel $(FILE_GRUB_KERNEL) --ramdisk $(TARGET_OUT)/grub_fs.tar \
+	$(MKBOOTIMG) --board "GRUB" --kernel $(FILE_GRUB_KERNEL) --ramdisk $(TARGET_OUT)/grub_fs.cpio \
 		--ramdisk_offset 0x2000000 \
 		--pagesize 2048 --base $$(printf "0x%x" $$(($(GRUB_LOADING_ADDRESS)-0x8000))) -o $(TARGET_OUT)/grub/grub_sideload.img
 .PHONY : grub_sideload_image

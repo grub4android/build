@@ -64,11 +64,20 @@ multiboot_configure: $(MULTIBOOT_OUT)/Makefile
 # main build
 multiboot: multiboot_configure tracy selinux busybox e2fsprogs
 	$(MAKE) -C $(MULTIBOOT_OUT)
-	cp $(MULTIBOOT_OUT)/init $(MULTIBOOT_BOOTFS)/
-	cp $(MULTIBOOT_DIR)/prebuilt/* $(MULTIBOOT_BOOTFS)/
-	cp $(BUSYBOX_OUT)/busybox $(MULTIBOOT_BOOTFS)/
-	cp $(E2FSPROGS_OUT)/e2fsck/e2fsck.stripped $(MULTIBOOT_BOOTFS)/e2fsck
-	cp build/devices/$(DEVICE_NAME)/fstab $(MULTIBOOT_BOOTFS)/
+	rm -Rf $(MULTIBOOT_BOOTFS)/*
+	mkdir $(MULTIBOOT_BOOTFS)/sbin/
+	mkdir $(MULTIBOOT_BOOTFS)/etc/
+	
+	cp $(MULTIBOOT_OUT)/init $(MULTIBOOT_BOOTFS)/sbin/
+	cp $(MULTIBOOT_DIR)/prebuilt/* $(MULTIBOOT_BOOTFS)/sbin/
+	cp $(BUSYBOX_OUT)/busybox $(MULTIBOOT_BOOTFS)/sbin/
+	cp $(E2FSPROGS_OUT)/e2fsck/e2fsck.stripped $(MULTIBOOT_BOOTFS)/sbin/e2fsck
+	cp $(E2FSPROGS_OUT)/misc/mke2fs $(MULTIBOOT_BOOTFS)/sbin/mke2fs
+	cp build/devices/$(DEVICE_NAME)/fstab $(MULTIBOOT_BOOTFS)/etc/
+	
+	ln -s mke2fs $(MULTIBOOT_BOOTFS)/sbin/mkfs.ext2
+	ln -s mke2fs $(MULTIBOOT_BOOTFS)/sbin/mkfs.ext3
+	ln -s mke2fs $(MULTIBOOT_BOOTFS)/sbin/mkfs.ext4
 .PHONY : multiboot
 
 # cleanup
