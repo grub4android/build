@@ -83,6 +83,9 @@ grub_boot_fs: grub_kernel multiboot
 	sed -i -e '/{DEVICE_SPECIFIC_GRUB_CFG}/{r $(GRUB_DEVICE_GRUB_CFG)' -e 'd}' $(GRUB_BOOT_FS_DIR)/grub/grub.cfg
 	# kernel
 	cp $(FILE_GRUB_KERNEL) $(GRUB_BOOT_FS_DIR)/grub/core.img
+	# modules
+	mkdir $(GRUB_BOOT_FS_DIR)/grub/arm-uboot
+	cp $(GRUB_OUT)/grub-core/*\.mod $(GRUB_BOOT_FS_DIR)/grub/arm-uboot/
 	# multiboot
 	cp -R $(MULTIBOOT_BOOTFS) $(GRUB_BOOT_FS_DIR)/multiboot
 .PHONY : grub_boot_fs
