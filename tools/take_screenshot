@@ -12,8 +12,7 @@ fi
 # variables
 FILE_RAW="$1.raw"
 FOLDER_TOOLS=$(dirname $(realpath $0))
-FOLDER_PREBUILTS="$FOLDER_TOOLS/../../prebuilts"
-FASTBOOT="$FOLDER_PREBUILTS/fastboot"
+FASTBOOT="$FOLDER_TOOLS/../../out/host/fastboot/fastboot"
 
 if [ -z "$RESOLUTION" ];then
 	RESOLUTION=$($FASTBOOT getvar screen-resolution 2>&1 | head -1 | cut -d' ' -f2)
