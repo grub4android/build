@@ -1,27 +1,34 @@
-normal
-help
-echo
-ls
-reboot
-loadenv
-sleep
-test
-true
+# drivers
+uboot_fb
+uboot_keyboard
+
+## GRUB directory partition ##
+# partition tables
 part_gpt
 part_msdos
+# file systems
 fat
 ext2
-uboot_fb
+
+## GUI ##
+# gfx
 gfxmenu
-videoinfo
-videotest
-uboot_keyboard
-minicmd
+# fallback shell
+normal
+
+# for 'extract_entries_source'
+configfile
+
+# loaders
 android
-tar
+
+# file systems (for grub sideload ramdisk)
+newc
+
+# io handlers (for boot ramdisks)
 gzio
 xzio
 lzopio
-configfile
-newc
-search
+
+# common tools
+echo
