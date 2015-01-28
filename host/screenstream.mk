@@ -3,7 +3,7 @@ CLEAN_TARGETS += screenstream_clean
 DISTCLEAN_TARGETS += screenstream_distclean
 
 # paths
-SCREENSTREAM_OUT = $(TARGET_COMMON_OUT)/screenstream
+SCREENSTREAM_OUT = $(HOST_OUT)/screenstream
 SCREENSTREAM_DIR = $(TOPDIR)external/screenstream
 
 # create out dir
