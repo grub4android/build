@@ -31,12 +31,18 @@ $(DEFAULT_GOAL):
 
 # verfiy device name
 DEVICE_NAME = $(firstword $(MAKECMDGOALS))
+HOST_ONLY = 0
 ifeq ($(DEVICE_NAME),)
 $(error No device specified.  Use "make devicename")
 endif
+
+ifeq ($(DEVICE_NAME),host)
+HOST_ONLY = 1
+else
 ifeq ($(wildcard build/devices/$(DEVICE_NAME)/device.mk),)
 $(error $(DEVICE_NAME) is not a valid device.)
 endif
+endif # DEVICE_NAME
 
 # src paths
 CONFIG_DIR = $(TOPDIR)build/config
@@ -76,6 +82,7 @@ PATH := $(PWD)/$(TOOLCHAIN_NONE_EABI)/bin:$(PATH)
 #=============================================================================
 # DEVICES
 
+ifneq ($(HOST_ONLY),1)
 include $(TOPDIR)build/devices/$(DEVICE_NAME)/device.mk
 
 # generate build targets
@@ -99,11 +106,18 @@ $(DEVICE_NAME):
 .PHONY : $(DEVICE_NAME)
 endif
 
+else
+$(DEVICE_NAME):
+.PHONY : $(DEVICE_NAME)
+endif # !HOST_ONLY
+
 
 #=============================================================================
 # TASKS
 
+ifneq ($(HOST_ONLY),1)
 include $(TOPDIR)build/core/tasks/*.mk
+endif
 
 
 #=============================================================================
