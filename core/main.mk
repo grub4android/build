@@ -63,11 +63,7 @@ $(shell mkdir -p $(TARGET_OUT))
 $(shell mkdir -p $(TARGET_COMMON_OUT))
 $(shell mkdir -p $(HOST_OUT))
 
-# default variables
-GRUB_LOADING_ADDRESS = 0x08000000
-GRUB_FONT_SIZE = 16
-GRUB_COMPRESSION = cat
-GRUB_BOOT_PATH_PREFIX = boot/
+# cleanup targets
 CLEAN_TARGETS =
 DISTCLEAN_TARGETS =
 
