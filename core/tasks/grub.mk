@@ -15,9 +15,9 @@ FILE_GRUB_CONFIG = $(CONFIG_DIR)/load.cfg
 FILE_UBOOT_IMAGE = $(GRUB_TARGET_OUT)/uboot.img
 
 # builtin modules
-GRUB_BUILTIN_MODULES = $(shell cat $(CONFIG_DIR)/modules_builtin.lst | xargs)
+GRUB_BUILTIN_MODULES = $(shell cat $(CONFIG_DIR)/modules_builtin.lst | grep -v "^\s*\#" | xargs -I{} sh -c "echo {} | cut -d\# -f1" | xargs)
 ifneq ($(wildcard build/devices/$(DEVICE_NAME)/modules_builtin.lst),)
-GRUB_BUILTIN_MODULES += $(shell cat build/devices/$(DEVICE_NAME)/modules_builtin.lst | xargs)
+GRUB_BUILTIN_MODULES += $(shell cat build/devices/$(DEVICE_NAME)/modules_builtin.lst | grep -v "^\s*\#" | xargs -I{} sh -c "echo {} | cut -d\# -f1" | xargs)
 endif
 
 # grub/grub2
