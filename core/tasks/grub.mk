@@ -88,6 +88,18 @@ grub_boot_fs: grub_kernel multiboot
 	cp $(GRUB_OUT)/grub-core/*\.mod $(GRUB_BOOT_FS_DIR)/grub/arm-uboot/
 	# multiboot
 	cp -R $(MULTIBOOT_BOOTFS) $(GRUB_BOOT_FS_DIR)/multiboot
+	# TWRP curtain
+	mkdir $(GRUB_BOOT_FS_DIR)/multiboot/res/
+	convert $(PREBUILTS_DIR)/logo/g4a.png \
+		-resize $$(build/tools/font_inch_to_px $(DISPLAY_PPI) "0.8")x$$(build/tools/font_inch_to_px $(DISPLAY_PPI) "0.8") \
+		-gravity center -background black -extent $(DISPLAY_WIDTH)x$(DISPLAY_HEIGHT) \
+		-pointsize $$(build/tools/font_inch_to_px $(DISPLAY_PPI) "0.19") \
+		-fill white -draw "text 0,-$$(($$(build/tools/font_inch_to_px $(DISPLAY_PPI) 0.8)/2+$$(build/tools/font_inch_to_px $(DISPLAY_PPI) 0.19))) 'TWRP'" \
+		-fill white -draw "text 0,$$(($$(build/tools/font_inch_to_px $(DISPLAY_PPI) 0.8)/2+$$(build/tools/font_inch_to_px $(DISPLAY_PPI) 0.19))) 'Multiboot'" \
+		$(GRUB_BOOT_FS_DIR)/multiboot/res/twrp_curtain.jpg
+	
+	rm -Rf $(OTAPACKAGE_OUT)/grub_boot_fs
+	cp -R $(GRUB_BOOT_FS_DIR) $(OTAPACKAGE_OUT)/grub_boot_fs
 .PHONY : grub_boot_fs
 
 grub_sideload_image: grub_boot_fs mkbootimg
