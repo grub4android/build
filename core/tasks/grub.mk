@@ -60,7 +60,7 @@ grub_core: grub_configure
 grub_uboot: grub_core
 	qemu-arm -r 3.11 -L $(TOOLCHAIN_LINUX_GNUEABIHF_LIBC) \
 		$(GRUB_OUT)/grub-mkimage -c $(FILE_GRUB_CONFIG) -O arm-uboot -o $(FILE_UBOOT_IMAGE) \
-			-d $(GRUB_OUT)/grub-core -p NULL -T $(GRUB_LOADING_ADDRESS) $(GRUB_BUILTIN_MODULES)
+			-d $(GRUB_OUT)/grub-core -p NULL $(GRUB_BUILTIN_MODULES)
 .PHONY : grub_uboot
 
 # raw kernel
