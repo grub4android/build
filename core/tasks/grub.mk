@@ -49,7 +49,7 @@ $(GRUB_OUT)/Makefile:
 	@ cd $(GRUB_DIR) && \
 	./autogen.sh && \
 	cd $(PWD)/$(GRUB_OUT) && \
-	$(PWD)/$(GRUB_DIR)/configure --host $(TOOLCHAIN_LINUX_GNUEABIHF_HOST) CFLAGS='-static-libgcc -Wl,-static'
+	$(PWD)/$(GRUB_DIR)/configure --host $(TOOLCHAIN_LINUX_GNUEABIHF_HOST) CFLAGS='-static-libgcc -Wl,-static' TARGET_CFLAGS='-O3'
 
 # main kernel
 grub_core: grub_configure
