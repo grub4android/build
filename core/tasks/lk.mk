@@ -60,8 +60,12 @@ lk: lk_font
 .PHONY : lk
 
 lk_bootimg: lk mkbootimg
+	echo "#include \"$(PWD)/$(LK_OUT)/build-$(LK_TARGET_NAME)/config.h\"" > $(LK_OUT)/kernel_addr.c
+	echo -e "#include <stdio.h>\nint main(void){printf(\"0x%x\", KERNEL_ADDR); return 0;}" >> $(LK_OUT)/kernel_addr.c
+	gcc $(LK_OUT)/kernel_addr.c -o $(LK_OUT)/kernel_addr
+	
 	$(MKBOOTIMG)  --kernel $(LK_OUT)/build-$(LK_TARGET_NAME)/lk.bin --ramdisk /dev/zero $(LK_MKBOOTIMG_ADDITIONAL_FLAGS) \
-		--pagesize 2048 --base $$(printf "0x%x" $$(($(LK_LOADING_ADDRESS)-0x8000))) -o $(TARGET_OUT)/lkboot.img
+		--pagesize 2048 --base $$(printf "0x%x" $$($(LK_OUT)/kernel_addr)) -o $(TARGET_OUT)/lkboot.img
 .PHONY : lk_bootimg
 
 lk_clean:
