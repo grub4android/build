@@ -1,6 +1,5 @@
 # drivers
-uboot_fb
-uboot_keyboard
+efi_gop
 
 ## GRUB directory partition ##
 # partition tables

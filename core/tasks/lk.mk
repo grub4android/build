@@ -12,27 +12,15 @@ $(shell mkdir -p $(LK_OUT))
 # common
 LK_MAKE_FLAGS = \
 	$(ARM_CROSS_COMPILE) \
-	GRUB_LOADING_ADDRESS=$(GRUB_LOADING_ADDRESS) \
-	GRUB_LOADING_ADDRESS_VIRTUAL=$(GRUB_LOADING_ADDRESS_VIRTUAL) \
 	GRUB_BOOT_PARTITION=$(GRUB_BOOT_PARTITION) \
 	GRUB_BOOT_PATH_PREFIX=$(GRUB_BOOT_PATH_PREFIX) \
-	BOOTLOADER_OUT=$(PWD)/$(LK_OUT) \
 	BUILDROOT=$(PWD)/$(LK_OUT) \
 	LKFONT_HEADER=$(PWD)/$(LK_OUT)/lkfont.h
 
 # 2ndstage
 ifneq ($(ENABLE_2NDSTAGE_BOOT),)
 LK_MAKE_FLAGS += \
-	ENABLE_2NDSTAGE_BOOT=$(ENABLE_2NDSTAGE_BOOT) \
-	DISPLAY_2NDSTAGE_WIDTH=$(DISPLAY_WIDTH) \
-	DISPLAY_2NDSTAGE_HEIGHT=$(DISPLAY_HEIGHT) \
-	DISPLAY_2NDSTAGE_BPP=$(DISPLAY_BPP)
-
-ifneq ($(DISPLAY_FBADDR),)
-LK_MAKE_FLAGS += \
-	DISPLAY_2NDSTAGE_FBADDR=$(DISPLAY_FBADDR)
-endif
-
+	ENABLE_2NDSTAGE_BOOT=$(ENABLE_2NDSTAGE_BOOT)
 endif
 
 # membase
@@ -61,7 +49,7 @@ lk: lk_font
 
 lk_bootimg: lk mkbootimg
 	echo "#include \"$(PWD)/$(LK_OUT)/build-$(LK_TARGET_NAME)/config.h\"" > $(LK_OUT)/kernel_addr.c
-	echo -e "#include <stdio.h>\nint main(void){printf(\"0x%x\", KERNEL_ADDR); return 0;}" >> $(LK_OUT)/kernel_addr.c
+	echo -e "#include <stdio.h>\nint main(void){printf(\"0x%x\", LINUX_BASE); return 0;}" >> $(LK_OUT)/kernel_addr.c
 	gcc $(LK_OUT)/kernel_addr.c -o $(LK_OUT)/kernel_addr
 	
 	$(MKBOOTIMG)  --kernel $(LK_OUT)/build-$(LK_TARGET_NAME)/lk.bin --ramdisk /dev/zero $(LK_MKBOOTIMG_ADDITIONAL_FLAGS) \

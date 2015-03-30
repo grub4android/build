@@ -9,17 +9,14 @@ GRUB_TARGET_OUT = $(TARGET_OUT)/grub
 GRUB_BOOT_FS_DIR = $(GRUB_TARGET_OUT)/grub_rootfs
 
 # default variables
-GRUB_LOADING_ADDRESS ?= 0x08000000
-GRUB_LOADING_ADDRESS_VIRTUAL ?= 0x08000000
 GRUB_FONT_SIZE ?= 16
 GRUB_COMPRESSION ?= cat
 GRUB_BOOT_PATH_PREFIX ?= boot/
 
 # files
-FILE_GRUB_KERNEL = $(GRUB_TARGET_OUT)/grub_kernel.raw
+FILE_GRUB_KERNEL = $(GRUB_TARGET_OUT)/grub_core.img
 FILE_GRUB_FILEIMAGE = $(GRUB_TARGET_OUT)/grub_fileimage.img
 FILE_GRUB_CONFIG = $(CONFIG_DIR)/load.cfg
-FILE_UBOOT_IMAGE = $(GRUB_TARGET_OUT)/uboot.img
 
 # builtin modules
 GRUB_BUILTIN_MODULES = $(shell cat $(CONFIG_DIR)/modules_builtin.lst | grep -v "^\s*\#" | xargs -I{} sh -c "echo {} | cut -d\# -f1" | xargs)
@@ -50,7 +47,7 @@ $(GRUB_OUT)/Makefile:
 	@ cd $(GRUB_DIR) && \
 	./autogen.sh && \
 	cd $(PWD)/$(GRUB_OUT) && \
-	$(PWD)/$(GRUB_DIR)/configure --host $(TOOLCHAIN_LINUX_GNUEABIHF_HOST) CFLAGS='-static-libgcc -Wl,-static' TARGET_CFLAGS='-O3'
+	$(PWD)/$(GRUB_DIR)/configure --with-platform=efi --host $(TOOLCHAIN_LINUX_GNUEABIHF_HOST) CFLAGS='-static-libgcc -Wl,-static'
 
 # main kernel
 grub_core: grub_configure
@@ -58,15 +55,10 @@ grub_core: grub_configure
 .PHONY : grub_core
 
 # u-boot image
-grub_uboot: grub_core
+grub_kernel: grub_core
 	qemu-arm -r 3.11 -L $(TOOLCHAIN_LINUX_GNUEABIHF_LIBC) \
-		$(GRUB_OUT)/grub-mkimage -c $(FILE_GRUB_CONFIG) -O arm-uboot -o $(FILE_UBOOT_IMAGE) \
-			-d $(GRUB_OUT)/grub-core -p NULL $(GRUB_BUILTIN_MODULES)
-.PHONY : grub_uboot
-
-# raw kernel
-grub_kernel: grub_uboot
-	tail -c+65 < $(FILE_UBOOT_IMAGE) > $(FILE_GRUB_KERNEL)
+		$(GRUB_OUT)/grub-mkimage -c $(FILE_GRUB_CONFIG) -O arm-efi -o $(FILE_GRUB_KERNEL) \
+			-d $(GRUB_OUT)/grub-core -p "" $(GRUB_BUILTIN_MODULES)
 .PHONY : grub_kernel
 
 # boot image
@@ -76,34 +68,34 @@ grub_boot_fs: grub_kernel multiboot
 	rm -f /tmp/grub_font.pf2
 	
 	# directories
-	mkdir -p $(GRUB_BOOT_FS_DIR)/grub
-	mkdir -p $(GRUB_BOOT_FS_DIR)/grub/fonts
-	mkdir -p $(GRUB_BOOT_FS_DIR)/grub/locale
+	mkdir -p $(GRUB_BOOT_FS_DIR)/boot/grub
+	mkdir -p $(GRUB_BOOT_FS_DIR)/boot/grub/fonts
+	mkdir -p $(GRUB_BOOT_FS_DIR)/boot/grub/locale
 	
 	# font
 	$(GRUB_TOOL_PREFIX)-mkfont -s $$(build/tools/font_inch_to_px $(DISPLAY_PPI) "0.11") -o $(GRUB_TARGET_OUT)/unifont_uncompressed.pf2 $(PREBUILTS_DIR)/unifont/unifont.ttf
-	cat $(GRUB_TARGET_OUT)/unifont_uncompressed.pf2 | $(GRUB_COMPRESSION) > $(GRUB_BOOT_FS_DIR)/grub/fonts/unicode.pf2
+	cat $(GRUB_TARGET_OUT)/unifont_uncompressed.pf2 | $(GRUB_COMPRESSION) > $(GRUB_BOOT_FS_DIR)/boot/grub/fonts/unicode.pf2
 	# env
-	$(GRUB_TOOL_PREFIX)-editenv $(GRUB_BOOT_FS_DIR)/grub/grubenv create
+	$(GRUB_TOOL_PREFIX)-editenv $(GRUB_BOOT_FS_DIR)/boot/grub/grubenv create
 	# config
-	cp $(CONFIG_DIR)/grub.cfg $(GRUB_BOOT_FS_DIR)/grub/
-	sed -i -e '/{DEVICE_SPECIFIC_GRUB_CFG}/{r $(GRUB_DEVICE_GRUB_CFG)' -e 'd}' $(GRUB_BOOT_FS_DIR)/grub/grub.cfg
+	cp $(CONFIG_DIR)/grub.cfg $(GRUB_BOOT_FS_DIR)/boot/grub/
+	sed -i -e '/{DEVICE_SPECIFIC_GRUB_CFG}/{r $(GRUB_DEVICE_GRUB_CFG)' -e 'd}' $(GRUB_BOOT_FS_DIR)/boot/grub/grub.cfg
 	# kernel
-	cp $(FILE_GRUB_KERNEL) $(GRUB_BOOT_FS_DIR)/grub/core.img
+	cp $(FILE_GRUB_KERNEL) $(GRUB_BOOT_FS_DIR)/boot/grub/core.img
 	# modules
-	mkdir $(GRUB_BOOT_FS_DIR)/grub/arm-uboot
-	cp $(GRUB_OUT)/grub-core/*\.mod $(GRUB_BOOT_FS_DIR)/grub/arm-uboot/
+	mkdir $(GRUB_BOOT_FS_DIR)/boot/grub/arm-efi
+	cp $(GRUB_OUT)/grub-core/*\.mod $(GRUB_BOOT_FS_DIR)/boot/grub/arm-efi/
 	# multiboot
-	cp -R $(MULTIBOOT_BOOTFS) $(GRUB_BOOT_FS_DIR)/multiboot
+	cp -R $(MULTIBOOT_BOOTFS) $(GRUB_BOOT_FS_DIR)/boot/grub/multiboot
 	# TWRP curtain
-	mkdir $(GRUB_BOOT_FS_DIR)/multiboot/res/
+	mkdir $(GRUB_BOOT_FS_DIR)/boot/grub/multiboot/res/
 	convert $(PREBUILTS_DIR)/logo/g4a.png \
 		-resize $$(build/tools/font_inch_to_px $(DISPLAY_PPI) "0.8")x$$(build/tools/font_inch_to_px $(DISPLAY_PPI) "0.8") \
 		-gravity center -background black -extent $(DISPLAY_WIDTH)x$(DISPLAY_HEIGHT) \
 		-pointsize $$(build/tools/font_inch_to_px $(DISPLAY_PPI) "0.19") \
 		-fill white -draw "text 0,-$$(($$(build/tools/font_inch_to_px $(DISPLAY_PPI) 0.8)/2+$$(build/tools/font_inch_to_px $(DISPLAY_PPI) 0.19))) 'TWRP'" \
 		-fill white -draw "text 0,$$(($$(build/tools/font_inch_to_px $(DISPLAY_PPI) 0.8)/2+$$(build/tools/font_inch_to_px $(DISPLAY_PPI) 0.19))) 'Multiboot'" \
-		$(GRUB_BOOT_FS_DIR)/multiboot/res/twrp_curtain.jpg
+		$(GRUB_BOOT_FS_DIR)/boot/grub/multiboot/res/twrp_curtain.jpg
 .PHONY : grub_boot_fs
 
 grub_sideload_image: grub_boot_fs mkbootimg
@@ -113,9 +105,8 @@ grub_sideload_image: grub_boot_fs mkbootimg
 		find . | cpio -o -H newc -R root:root > $(PWD)/$(TARGET_OUT)/grub_fs.cpio
 	
 	# build sideload image
-	$(MKBOOTIMG) --board "GRUB" --kernel $(FILE_GRUB_KERNEL) --ramdisk $(TARGET_OUT)/grub_fs.cpio \
-		--ramdisk_offset 0x2000000 \
-		--pagesize 2048 --base $$(printf "0x%x" $$(($(GRUB_LOADING_ADDRESS_VIRTUAL)-0x8000))) -o $(TARGET_OUT)/grub/grub_sideload.img
+	$(MKBOOTIMG) --kernel $(FILE_GRUB_KERNEL) --ramdisk $(TARGET_OUT)/grub_fs.cpio \
+		--pagesize 2048 -o $(TARGET_OUT)/grub/grub_sideload.img
 .PHONY : grub_sideload_image
 
 grub_clean:
